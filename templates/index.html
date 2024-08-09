@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game và Video</title>
+    <style>
+        header {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            color: white; 
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem; 
+            font-family: 'Paytone One', sans-serif; 
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+            z-index: 1000; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            padding: 0 20px; 
+            margin-left: 450px;
+        }
+        body {
+            margin-top: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            background-image: url('{{ url_for('static', filename='images/palmtree.png') }}'); 
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .game {
+            width: 800px; 
+            height: 540px;
+            border: 2px solid #000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 360px; 
+            height: 540px; 
+        }
+        .video {
+            flex: 1;
+            border: 2px solid #000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .info {
+            flex: 1;
+            border: 2px solid #000;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 15px; 
+            background-color: #fff;
+            border-radius: 10px;
+            font-family: Arial, sans-serif;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .info p {
+            margin: 8px 0; 
+            font-size: 1rem; 
+        }
+        .info input, .info button {
+            padding: 8px;
+            font-size: 0.9rem;
+            margin-top: 8px; 
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .info button {
+            background-color:#33CCFF;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .info button:hover {
+            background-color: #33CCFF;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    </style>
+</head>
+<body>
+    <header>Slime Jumping</header>
+    <div class="container">
+        <div class="game">
+            <iframe src="https://e.gamevui.vn/web/2023/11/slime-thi-nhay?gid=22851&returnurl=https%3a%2f%2fgamevui.vn%2fslime-thi-nhay%2fgame&ratedages=0" allowfullscreen sandbox="allow-same-origin allow-scripts" referrerpolicy="no-referrer"></iframe>
+
+        </div>
+        <div class="video-container">
+            <div class="video">
+                <img src="{{ url_for('video_feed') }}" id="video-feed" alt="Video feed">
+            </div>
+            <div class="info">
+                <p>THÔNG TIN</p>
+                <p id="count">Số lần tập: 0</p>
+                <p id="calories">Calo tiêu thụ: 0</p>
+                <input type="number" id="weight" placeholder="Nhập cân nặng">
+                <button onclick="setWeight()">Cập nhật cân nặng</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function updateInfo() {
+            const response = await fetch('/info');
+            const data = await response.json();
+            document.getElementById('count').innerText = `Số lần tập: ${data.counting} cái`;
+            document.getElementById('calories').innerText = `Calo tiêu thụ: ${data.calories_burned.toFixed(2)} calo`;
+        }
+
+        async function setWeight() {
+            const weight = document.getElementById('weight').value;
+            if (weight) {
+                await fetch('/set_weight', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        'weight': weight
+                    })
+                });
+                updateInfo();
+            }
+        }
+
+        setInterval(updateInfo, 1000); // Update info every second
+    </script>
+</body>
+</html>
